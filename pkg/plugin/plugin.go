@@ -22,7 +22,7 @@ func (bppl *BinPackingPlugin) Name() string {
 	return Name
 }
 
-func (bppl *BinPackingPlugin) Less(pInfo1, pInfo2 *framework.QueuedPodInfo) bool {
+func (bppl *BinPackingPlugin) Less(pInfo1, pInfo2 *framework.PodInfo) bool {
 	/* 排序pod */
 	p1 := pod.GetPodPriority(pInfo1.Pod)
 	p2 := pod.GetPodPriority(pInfo2.Pod)
@@ -71,7 +71,7 @@ func (bppl *BinPackingPlugin) Score(ctx context.Context, state *framework.CycleS
 	if err != nil {
 		return 0, framework.NewStatus(framework.Error, fmt.Sprintf("getting node %q from Snapshot: %v", nodeName, err))
 	}
-	podNum := len(nodeInfo.Pods)
+	podNum := len(nodeInfo.Pods())
 	return int64(podNum * 10), nil
 }
 
@@ -79,7 +79,7 @@ func (bppl *BinPackingPlugin) ScoreExtensions() framework.ScoreExtensions {
 	return nil
 }
 
-func New(configuration runtime.Object, f framework.FrameworkHandle) (framework.Plugin, error) {
+func New(configuration *runtime.Unknown, f framework.FrameworkHandle) (framework.Plugin, error) {
 	return &BinPackingPlugin{
 		handle: f,
 	}, nil

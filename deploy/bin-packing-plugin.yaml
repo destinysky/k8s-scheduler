@@ -152,7 +152,7 @@ data:
   scheduler-config.yaml: |
     apiVersion: kubescheduler.config.k8s.io/v1alpha1
     kind: KubeSchedulerConfiguration
-    schedulerName: Bin-Packing-Plugin
+    schedulerName: sample-scheduler
     leaderElection:
       leaderElect: true
       lockObjectName: sample-scheduler
@@ -164,6 +164,9 @@ data:
       score:
         enabled:
         - name: "Bin-Packing-Plugin"
+    pluginConfig:
+    - name: "sample-scheduler"
+      args: {"master": "master", "kubeconfig": "kubeconfig"} 
 ---
 apiVersion: apps/v1
 kind: Deployment
