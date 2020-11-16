@@ -3,8 +3,10 @@ package plugin
 import (
 	"context"
 	"fmt"
+
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/klog"
 	"k8s.io/kubernetes/pkg/api/v1/pod"
 	framework "k8s.io/kubernetes/pkg/scheduler/framework/v1alpha1"
 )
@@ -17,6 +19,7 @@ const Name = "Bin-Packing-Plugin"
 
 var _ framework.QueueSortPlugin = &BinPackingPlugin{}
 var _ framework.ScorePlugin = &BinPackingPlugin{}
+var _ framework.ScoreExtensions = &BinPackingPlugin{}
 
 func (bppl *BinPackingPlugin) Name() string {
 	return Name
@@ -75,8 +78,34 @@ func (bppl *BinPackingPlugin) Score(ctx context.Context, state *framework.CycleS
 	return int64(podNum * 10), nil
 }
 
+func (bppl *BinPackingPlugin) NormalizeScore(ctx context.Context, state *framework.CycleState, p *v1.Pod, scores framework.NodeScoreList) *framework.Status {
+	var (
+		highest int64 = 0
+		lowest        = scores[0].Score
+	)
+	for _, nodeScore := range scores {
+		if nodeScore.Score < lowest {
+			lowest = nodeScore.Score
+		}
+		if nodeScore.Score > highest {
+			highest = nodeScore.Score
+		}
+	}
+
+	if highest == lowest {
+		lowest--
+	}
+
+	// Set Range to [0-100]
+	for i, nodeScore := range scores {
+		scores[i].Score = (nodeScore.Score - lowest) * framework.MaxNodeScore / (highest - lowest)
+		klog.V(3).Infof("node: %v, final Score: %v", scores[i].Name, scores[i].Score)
+	}
+	return framework.NewStatus(framework.Success, "")
+}
+
 func (bppl *BinPackingPlugin) ScoreExtensions() framework.ScoreExtensions {
-	return nil
+	return bppl
 }
 
 func New(configuration *runtime.Unknown, f framework.FrameworkHandle) (framework.Plugin, error) {

@@ -193,7 +193,7 @@ spec:
             name: scheduler-config
       containers:
         - name: scheduler-ctrl
-          image: docker.io/library/bin-packing-plugin:1.0.1
+          image: docker.io/destinysky/scheduler:1.0.3
           imagePullPolicy: IfNotPresent
           args:
             - bin-packing-plugin
