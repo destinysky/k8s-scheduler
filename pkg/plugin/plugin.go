@@ -25,7 +25,7 @@ func (bppl *BinPackingPlugin) Name() string {
 	return Name
 }
 
-func (bppl *BinPackingPlugin) Less(pInfo1, pInfo2 *framework.PodInfo) bool {
+func (bppl *BinPackingPlugin) Less(pInfo1, pInfo2 *framework.QueuedPodInfo) bool {
 	/* 排序pod */
 	p1 := pod.GetPodPriority(pInfo1.Pod)
 	p2 := pod.GetPodPriority(pInfo2.Pod)
