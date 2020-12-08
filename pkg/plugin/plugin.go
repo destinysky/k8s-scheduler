@@ -74,7 +74,7 @@ func (bppl *BinPackingPlugin) Score(ctx context.Context, state *framework.CycleS
 	if err != nil {
 		return 0, framework.NewStatus(framework.Error, fmt.Sprintf("getting node %q from Snapshot: %v", nodeName, err))
 	}
-	podNum := len(nodeInfo.Pods())
+	podNum := len(nodeInfo.Pods)
 	return int64(podNum * 10), nil
 }
 
@@ -108,7 +108,7 @@ func (bppl *BinPackingPlugin) ScoreExtensions() framework.ScoreExtensions {
 	return bppl
 }
 
-func New(configuration *runtime.Unknown, f framework.FrameworkHandle) (framework.Plugin, error) {
+func New(configuration runtime.Object, f framework.FrameworkHandle) (framework.Plugin, error) {
 	return &BinPackingPlugin{
 		handle: f,
 	}, nil
